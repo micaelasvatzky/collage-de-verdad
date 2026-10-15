@@ -1,0 +1,94 @@
+.element {
+  position: absolute;
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
+}
+
+.element:active {
+  cursor: grabbing;
+}
+
+.element:not(.selected):hover {
+  outline: 1px dashed rgba(255, 255, 255, 0.6);
+  outline-offset: 5px;
+}
+
+/* La pieza en edición queda por encima del resto (sin reordenar el collage). */
+.selected {
+  z-index: 1000;
+}
+
+.outline {
+  position: absolute;
+  inset: -6px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.scaleHandle {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #2f86d6;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  cursor: nwse-resize;
+  touch-action: none;
+  transform: scale(var(--inv-scale, 1));
+  transform-origin: center;
+}
+
+.rotateHandle {
+  position: absolute;
+  left: 50%;
+  top: -36px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #d94f8a;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  cursor: grab;
+  touch-action: none;
+  transform: translateX(-50%) scale(var(--inv-scale, 1));
+  transform-origin: center;
+}
+
+.rotateHandle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateX(-50%);
+}
+
+.removeHandle {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #d94f4f;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  transform: scale(var(--inv-scale, 1));
+  transform-origin: center;
+}

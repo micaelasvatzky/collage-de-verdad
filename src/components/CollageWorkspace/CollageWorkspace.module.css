@@ -1,0 +1,54 @@
+.workspace {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  touch-action: none;
+  /* Madera de la mesa: vetas + luz cálida desde arriba. */
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.07) 0 2px, transparent 2px 11px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 27px),
+    radial-gradient(150% 110% at 50% -10%, var(--table-light) 0%, var(--table-mid) 45%, var(--table-dark) 100%);
+}
+
+.caption {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  z-index: 10;
+  max-width: 320px;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.caption h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  letter-spacing: 0.4px;
+}
+
+.caption p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.88;
+}
+
+.elementsLayer {
+  position: absolute;
+  inset: 0;
+  /* Transparente a los clicks: solo las piezas capturan eventos. */
+  pointer-events: none;
+}
+
+.elementsLayer > * {
+  pointer-events: auto;
+}
+
+.spawnPreview {
+  position: fixed;
+  z-index: 5000;
+  transform: translate(-50%, -50%) scale(1.08);
+  opacity: 0.92;
+  pointer-events: none;
+}

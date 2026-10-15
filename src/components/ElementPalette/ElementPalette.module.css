@@ -1,0 +1,11 @@
+.palette {
+  position: absolute;
+  inset: 0;
+  /* La capa no captura clicks: solo sus piezas. Así el fondo sigue siendo
+     clickeable para deseleccionar. */
+  pointer-events: none;
+}
+
+.palette > * {
+  pointer-events: auto;
+}

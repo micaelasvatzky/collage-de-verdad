@@ -1,0 +1,24 @@
+.item {
+  position: absolute;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+  transition:
+    opacity 120ms ease,
+    filter 120ms ease;
+}
+
+.item:hover {
+  filter: brightness(1.08);
+}
+
+.item:active {
+  cursor: grabbing;
+}
+
+.dragging {
+  opacity: 0.3;
+  cursor: grabbing;
+}
