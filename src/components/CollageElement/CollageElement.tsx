@@ -2,11 +2,9 @@
 
 import { useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import type { PaletteItem, PlacedElement } from "@/types/collage";
+import { clampPosition, maxScaleAt, MIN_SCALE } from "@/lib/collageGeometry";
 import ElementVisual from "@/components/ElementVisual/ElementVisual";
 import styles from "./CollageElement.module.css";
-
-const MIN_SCALE = 0.25;
-const MAX_SCALE = 4;
 
 /**
  * Un gesto en curso. Guardamos una "foto" del estado inicial al presionar y,
@@ -47,6 +45,14 @@ interface Props {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+/** Tamaño del viewport (el "canvas" del collage: la pantalla completa). */
+function viewportSize() {
+  return {
+    w: window.innerWidth,
+    h: window.innerHeight,
+  };
 }
 
 /**
@@ -124,23 +130,43 @@ export default function CollageElement({
     if (!gesture) return;
 
     if (gesture.kind === "move") {
-      onChange(placed.id, {
-        x: gesture.startX + (e.clientX - gesture.startClientX),
-        y: gesture.startY + (e.clientY - gesture.startClientY),
-      });
+      const { w, h } = viewportSize();
+      const next = clampPosition(
+        palette,
+        placed.rotation,
+        placed.scale,
+        gesture.startX + (e.clientX - gesture.startClientX),
+        gesture.startY + (e.clientY - gesture.startClientY),
+        w,
+        h,
+      );
+      onChange(placed.id, { x: next.x, y: next.y });
       return;
     }
 
     if (gesture.kind === "scale") {
+      const { w, h } = viewportSize();
       const dist = Math.hypot(e.clientX - gesture.centerX, e.clientY - gesture.centerY);
-      const nextScale = clamp((gesture.startScale * dist) / gesture.startDist, MIN_SCALE, MAX_SCALE);
-      onChange(placed.id, { scale: nextScale });
+      // Tope de escala: ni el máximo absoluto, ni más de lo que deja el hueco
+      // hasta el borde más cercano. Así una pieza pegada a la pared no crece.
+      const hardMax = maxScaleAt(palette, placed.rotation, gesture.centerX, gesture.centerY, w, h);
+      const desired = (gesture.startScale * dist) / gesture.startDist;
+      const nextScale = clamp(desired, MIN_SCALE, hardMax);
+      // Al reescalar puede quedar fuera de borde (si creció cerca de la pared):
+      // reencuadramos el centro.
+      const next = clampPosition(palette, placed.rotation, nextScale, placed.x, placed.y, w, h);
+      onChange(placed.id, { scale: nextScale, x: next.x, y: next.y });
       return;
     }
 
+    const { w, h } = viewportSize();
     const angle = Math.atan2(e.clientY - gesture.centerY, e.clientX - gesture.centerX);
     const delta = ((angle - gesture.startAngle) * 180) / Math.PI;
-    onChange(placed.id, { rotation: gesture.startRotation + delta });
+    const nextRotation = gesture.startRotation + delta;
+    // Rotar cambia la caja ocupada: reencuadramos para que ninguna esquina se
+    // escape del viewport.
+    const next = clampPosition(palette, nextRotation, placed.scale, placed.x, placed.y, w, h);
+    onChange(placed.id, { rotation: nextRotation, x: next.x, y: next.y });
   }
 
   function endGesture() {

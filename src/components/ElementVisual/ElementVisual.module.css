@@ -1,15 +1,9 @@
 .visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.32);
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32));
   /* La interacción la maneja siempre el elemento padre. */
   pointer-events: none;
-}
-
-.emoji {
-  font-size: 22px;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }

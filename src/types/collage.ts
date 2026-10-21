@@ -36,10 +36,8 @@ export interface PaletteItem {
   tableY: number;
   /** Inclinación en reposo mientras descansa en la mesa, en grados. */
   restRotation: number;
-  /** Color de la pieza (placeholder hasta tener las imágenes reales). */
-  color: string;
-  /** Radio del borde (placeholder). */
-  radius: string;
+  /** Ruta pública a la imagen real de la pieza, relativa a `/public`. */
+  src: string;
 }
 
 /**

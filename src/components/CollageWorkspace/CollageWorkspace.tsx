@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PALETTE_ITEMS } from "@/data/paletteElements";
+import { clampPosition } from "@/lib/collageGeometry";
 import type { PaletteItem as PaletteItemModel, PlacedElement } from "@/types/collage";
 import CollageElement from "@/components/CollageElement/CollageElement";
 import ElementPalette from "@/components/ElementPalette/ElementPalette";
 import ElementVisual from "@/components/ElementVisual/ElementVisual";
 import PhotoBoard from "@/components/PhotoBoard/PhotoBoard";
+import SendEmail from "@/components/SendEmail/SendEmail";
 import styles from "./CollageWorkspace.module.css";
 
 interface SpawnPreview {
@@ -60,12 +62,21 @@ export default function CollageWorkspace() {
     if (!insidePhoto) return;
 
     const workspaceRect = workspace.getBoundingClientRect();
+    const drop = clampPosition(
+      item,
+      0,
+      1,
+      clientX - workspaceRect.left,
+      clientY - workspaceRect.top,
+      workspaceRect.width,
+      workspaceRect.height,
+    );
     seqRef.current += 1;
     const newElement: PlacedElement = {
       id: `${item.id}-${seqRef.current}`,
       paletteId: item.id,
-      x: clientX - workspaceRect.left,
-      y: clientY - workspaceRect.top,
+      x: drop.x,
+      y: drop.y,
       scale: 1,
       rotation: 0,
     };
@@ -141,6 +152,8 @@ export default function CollageWorkspace() {
         onSpawnDrop={handleSpawnDrop}
         onSpawnCancel={handleSpawnCancel}
       />
+
+      <SendEmail onDeselect={() => setSelectedId(null)} photoRef={photoRef} />
 
       {spawn && spawnItem ? (
         <div
