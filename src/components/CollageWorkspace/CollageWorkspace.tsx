@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PALETTE_ITEMS } from "@/data/paletteElements";
-import { clampPosition } from "@/lib/collageGeometry";
+import { clampCenter } from "@/lib/collageGeometry";
 import type { PaletteItem as PaletteItemModel, PlacedElement } from "@/types/collage";
 import CollageElement from "@/components/CollageElement/CollageElement";
 import ElementPalette from "@/components/ElementPalette/ElementPalette";
 import ElementVisual from "@/components/ElementVisual/ElementVisual";
+import ExportPanel from "@/components/ExportPanel/ExportPanel";
 import PhotoBoard from "@/components/PhotoBoard/PhotoBoard";
-import SendEmail from "@/components/SendEmail/SendEmail";
 import styles from "./CollageWorkspace.module.css";
 
 interface SpawnPreview {
@@ -33,7 +33,7 @@ export default function CollageWorkspace() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [spawn, setSpawn] = useState<SpawnPreview | null>(null);
 
-  const workspaceRef = useRef<HTMLDivElement>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
   const photoRef = useRef<HTMLDivElement>(null);
   const seqRef = useRef(0);
 
@@ -50,8 +50,7 @@ export default function CollageWorkspace() {
     setSpawn(null);
 
     const photo = photoRef.current;
-    const workspace = workspaceRef.current;
-    if (!photo || !workspace) return;
+    if (!photo) return;
 
     const photoRect = photo.getBoundingClientRect();
     const insidePhoto =
@@ -61,16 +60,13 @@ export default function CollageWorkspace() {
       clientY <= photoRect.bottom;
     if (!insidePhoto) return;
 
-    const workspaceRect = workspace.getBoundingClientRect();
-    const drop = clampPosition(
-      item,
-      0,
-      1,
-      clientX - workspaceRect.left,
-      clientY - workspaceRect.top,
-      workspaceRect.width,
-      workspaceRect.height,
+    const drop = clampCenter(
+      clientX - photoRect.left,
+      clientY - photoRect.top,
+      photoRect.width,
+      photoRect.height,
     );
+
     seqRef.current += 1;
     const newElement: PlacedElement = {
       id: `${item.id}-${seqRef.current}`,
@@ -94,6 +90,23 @@ export default function CollageWorkspace() {
     setSelectedId((current) => (current === id ? null : current));
   }, []);
 
+  /* Si cambia el tamaño de la ventana, reencuadramos las piezas al nuevo marco. */
+  useEffect(() => {
+    function handleResize() {
+      const photo = photoRef.current;
+      if (!photo) return;
+      const rect = photo.getBoundingClientRect();
+      setPlaced((prev) =>
+        prev.map((el) => {
+          const next = clampCenter(el.x, el.y, rect.width, rect.height);
+          return next.x === el.x && next.y === el.y ? el : { ...el, x: next.x, y: next.y };
+        }),
+      );
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   /* Atajos: Escape deselecciona, Delete/Backspace quita la pieza elegida. */
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -115,34 +128,30 @@ export default function CollageWorkspace() {
   const spawnItem = spawn ? findPaletteItem(spawn.paletteId) : undefined;
 
   return (
-    <div
-      ref={workspaceRef}
-      className={styles.workspace}
-      onPointerDown={() => setSelectedId(null)}
-    >
+    <div className={styles.workspace} onPointerDown={() => setSelectedId(null)}>
       <div className={styles.caption}>
         <h1>Collage de Verdad</h1>
         <p>Arrastrá los elementos de la mesa sobre la foto para crear tu propia realidad.</p>
       </div>
 
-      <PhotoBoard ref={photoRef} />
-
-      <div className={styles.elementsLayer}>
-        {placed.map((element) => {
-          const palette = findPaletteItem(element.paletteId);
-          if (!palette) return null;
-          return (
-            <CollageElement
-              key={element.id}
-              palette={palette}
-              placed={element}
-              selected={selectedId === element.id}
-              onSelect={setSelectedId}
-              onChange={handleChange}
-              onRemove={handleRemove}
-            />
-          );
-        })}
+      <div className={styles.stage}>
+        <PhotoBoard ref={boardRef} contentRef={photoRef}>
+          {placed.map((element) => {
+            const palette = findPaletteItem(element.paletteId);
+            if (!palette) return null;
+            return (
+              <CollageElement
+                key={element.id}
+                palette={palette}
+                placed={element}
+                selected={selectedId === element.id}
+                onSelect={setSelectedId}
+                onChange={handleChange}
+                onRemove={handleRemove}
+              />
+            );
+          })}
+        </PhotoBoard>
       </div>
 
       <ElementPalette
@@ -153,13 +162,10 @@ export default function CollageWorkspace() {
         onSpawnCancel={handleSpawnCancel}
       />
 
-      <SendEmail onDeselect={() => setSelectedId(null)} photoRef={photoRef} />
+      <ExportPanel onDeselect={() => setSelectedId(null)} boardRef={boardRef} />
 
       {spawn && spawnItem ? (
-        <div
-          className={styles.spawnPreview}
-          style={{ left: spawn.clientX, top: spawn.clientY }}
-        >
+        <div className={styles.spawnPreview} style={{ left: spawn.clientX, top: spawn.clientY }}>
           <ElementVisual item={spawnItem} />
         </div>
       ) : null}

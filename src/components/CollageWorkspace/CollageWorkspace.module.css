@@ -34,14 +34,17 @@
   opacity: 0.88;
 }
 
-.elementsLayer {
+.stage {
   position: absolute;
   inset: 0;
-  /* Transparente a los clicks: solo las piezas capturan eventos. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* La capa no captura clicks: solo la foto y las piezas. */
   pointer-events: none;
 }
 
-.elementsLayer > * {
+.stage > * {
   pointer-events: auto;
 }
 

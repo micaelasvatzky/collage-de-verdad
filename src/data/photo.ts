@@ -1,10 +1,10 @@
 /**
  * Foto original del collage.
  *
- * Cómo usarla: dejá tu archivo en la carpeta `public/` de la raíz del proyecto
- * y actualizá el nombre acá. Mientras no exista, se muestra un marcador de
- * posición gris para que puedas seguir probando las interacciones.
- *
- * Ejemplo: ponés `public/mi-foto.jpg` y dejás PHOTO_SRC = "/mi-foto.jpg".
+ * El archivo vive en `public/elementos/` y sus medidas (en px) se usan para
+ * que el marco respete la proporción real de la imagen y no recorte nada.
+ * Si cambiás la foto, actualizá también `PHOTO_WIDTH` y `PHOTO_HEIGHT`.
  */
-export const PHOTO_SRC = "/photo.jpg";
+export const PHOTO_SRC = "/elementos/imagen-fondo.jpg";
+export const PHOTO_WIDTH = 548;
+export const PHOTO_HEIGHT = 364;

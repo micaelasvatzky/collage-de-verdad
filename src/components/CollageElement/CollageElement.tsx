@@ -2,7 +2,7 @@
 
 import { useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import type { PaletteItem, PlacedElement } from "@/types/collage";
-import { clampPosition, maxScaleAt, MIN_SCALE } from "@/lib/collageGeometry";
+import { clampCenter, MAX_SCALE, MIN_SCALE } from "@/lib/collageGeometry";
 import ElementVisual from "@/components/ElementVisual/ElementVisual";
 import styles from "./CollageElement.module.css";
 
@@ -47,20 +47,13 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-/** Tamaño del viewport (el "canvas" del collage: la pantalla completa). */
-function viewportSize() {
-  return {
-    w: window.innerWidth,
-    h: window.innerHeight,
-  };
-}
-
 /**
- * Una pieza ya colocada. Se puede arrastrar para moverla; al seleccionarla
- * aparecen dos manijas: una para escalar (esquina) y otra para rotar (arriba).
+ * Una pieza ya colocada sobre la foto. Se puede arrastrar para moverla; al
+ * seleccionarla aparecen dos manijas: una para escalar (esquina) y otra para
+ * rotar (arriba).
  *
- * La geometría vive en el workspace (x, y = centro en px) y se aplica con
- * `translate(-50%, -50%) rotate() scale()`, así rotación y escala pivotan
+ * La geometría vive en el área de la foto (x, y = centro en px) y se aplica
+ * con `translate(-50%, -50%) rotate() scale()`, así rotación y escala pivotan
  * siempre alrededor del centro de la pieza.
  */
 export default function CollageElement({
@@ -79,6 +72,15 @@ export default function CollageElement({
     const rect = rootRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }
+
+  /** Tamaño del área de la foto (el contenedor de las piezas). */
+  function stageSize() {
+    const rect = rootRef.current?.parentElement?.getBoundingClientRect();
+    return {
+      w: rect?.width ?? window.innerWidth,
+      h: rect?.height ?? window.innerHeight,
+    };
   }
 
   function beginGesture(gesture: Gesture, e: ReactPointerEvent<HTMLElement>) {
@@ -130,11 +132,8 @@ export default function CollageElement({
     if (!gesture) return;
 
     if (gesture.kind === "move") {
-      const { w, h } = viewportSize();
-      const next = clampPosition(
-        palette,
-        placed.rotation,
-        placed.scale,
+      const { w, h } = stageSize();
+      const next = clampCenter(
         gesture.startX + (e.clientX - gesture.startClientX),
         gesture.startY + (e.clientY - gesture.startClientY),
         w,
@@ -145,28 +144,16 @@ export default function CollageElement({
     }
 
     if (gesture.kind === "scale") {
-      const { w, h } = viewportSize();
       const dist = Math.hypot(e.clientX - gesture.centerX, e.clientY - gesture.centerY);
-      // Tope de escala: ni el máximo absoluto, ni más de lo que deja el hueco
-      // hasta el borde más cercano. Así una pieza pegada a la pared no crece.
-      const hardMax = maxScaleAt(palette, placed.rotation, gesture.centerX, gesture.centerY, w, h);
       const desired = (gesture.startScale * dist) / gesture.startDist;
-      const nextScale = clamp(desired, MIN_SCALE, hardMax);
-      // Al reescalar puede quedar fuera de borde (si creció cerca de la pared):
-      // reencuadramos el centro.
-      const next = clampPosition(palette, placed.rotation, nextScale, placed.x, placed.y, w, h);
-      onChange(placed.id, { scale: nextScale, x: next.x, y: next.y });
+      const nextScale = clamp(desired, MIN_SCALE, MAX_SCALE);
+      onChange(placed.id, { scale: nextScale });
       return;
     }
 
-    const { w, h } = viewportSize();
     const angle = Math.atan2(e.clientY - gesture.centerY, e.clientX - gesture.centerX);
     const delta = ((angle - gesture.startAngle) * 180) / Math.PI;
-    const nextRotation = gesture.startRotation + delta;
-    // Rotar cambia la caja ocupada: reencuadramos para que ninguna esquina se
-    // escape del viewport.
-    const next = clampPosition(palette, nextRotation, placed.scale, placed.x, placed.y, w, h);
-    onChange(placed.id, { rotation: nextRotation, x: next.x, y: next.y });
+    onChange(placed.id, { rotation: gesture.startRotation + delta });
   }
 
   function endGesture() {
