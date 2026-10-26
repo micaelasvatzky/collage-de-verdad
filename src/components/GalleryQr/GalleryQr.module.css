@@ -15,7 +15,6 @@
     0 18px 40px rgba(0, 0, 0, 0.42),
     0 0 0 1px rgba(255, 255, 255, 0.04) inset;
   backdrop-filter: blur(8px);
-  transform: rotate(-1.2deg);
 }
 
 .frame {
