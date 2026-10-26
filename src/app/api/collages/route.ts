@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
-import { isPng, saveCollage } from "@/lib/collageStore";
+import {
+  isDuplicateIdError,
+  isPng,
+  isStoreConfigured,
+  isValidCollageId,
+  saveDraft,
+} from "@/lib/collageStore";
 
-const MAX_NAME = 40;
-const MAX_TITLE = 60;
+/**
+ * Crea el borrador del collage.
+ *
+ * El navegador manda la imagen YA capturada y un id generado en el cliente.
+ * Con ese id se arma el QR antes de que la persona complete el formulario.
+ */
+
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
-
-function cleanText(value: string) {
-  return value.replace(/\s+/g, " ").trim();
-}
 
 function errorResponse(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
@@ -15,35 +22,47 @@ function errorResponse(message: string, status: number) {
 
 export async function POST(request: Request) {
   try {
-    const form = await request.formData();
-    const nameValue = form.get("name");
-    const titleValue = form.get("title");
-    const name = typeof nameValue === "string" ? cleanText(nameValue) : "";
-    const title = typeof titleValue === "string" ? cleanText(titleValue) : "";
-    const image = form.get("image");
+    if (!isStoreConfigured()) {
+      return errorResponse("Falta configurar la base de datos de la galería.", 503);
+    }
 
-    if (!name) return errorResponse("Poné tu nombre.", 400);
-    if (name.length > MAX_NAME) return errorResponse("El nombre es demasiado largo.", 400);
-    if (!title) return errorResponse("Ponele un título a tu obra.", 400);
-    if (title.length > MAX_TITLE) return errorResponse("El título es demasiado largo.", 400);
+    const form = await request.formData();
+    const idValue = form.get("id");
+    const image = form.get("image");
+    const id = typeof idValue === "string" ? idValue.trim() : "";
+
+    if (!isValidCollageId(id)) return errorResponse("Identificador inválido.", 400);
     if (!(image instanceof File)) return errorResponse("Falta la imagen del collage.", 400);
     if (image.type !== "image/png") return errorResponse("La imagen tiene que ser PNG.", 400);
-    if (image.size > MAX_IMAGE_BYTES) return errorResponse("La imagen pesa demasiado. Probá con menos elementos.", 413);
+    if (image.size > MAX_IMAGE_BYTES) {
+      return errorResponse("La imagen pesa demasiado. Probá con menos elementos.", 413);
+    }
 
     const buffer = Buffer.from(await image.arrayBuffer());
     if (!isPng(buffer)) return errorResponse("El archivo no es una imagen PNG válida.", 400);
 
-    const collage = await saveCollage({ name, title, image: buffer });
-    return NextResponse.json({ ok: true, collage }, { status: 201 });
-  } catch (error) {
-    console.error("Error publicando collage:", error);
+    await saveDraft({ id, image: buffer });
 
-    const message = error instanceof Error ? error.message : "";
-    if (message.includes("BLOB_READ_WRITE_TOKEN") || message.includes("BLOB_STORE_ID")) {
-      return errorResponse("Falta configurar el almacenamiento de la galería.", 503);
+    return NextResponse.json(
+      { ok: true, id, downloadUrl: `/api/collages/${id}/download` },
+      { status: 201 },
+    );
+  } catch (error) {
+    console.error("Error guardando el borrador del collage:", error);
+
+    if (isDuplicateIdError(error)) {
+      return errorResponse("Ese collage ya existe. Probá de nuevo.", 409);
     }
 
-    if (message.toLowerCase().includes("body exceeded") || message.toLowerCase().includes("too large")) {
+    if (error instanceof Error && error.message === "MISSING_MONGODB_URI") {
+      return errorResponse("Falta configurar la base de datos de la galería.", 503);
+    }
+
+    if (
+      error instanceof Error &&
+      (error.message.toLowerCase().includes("body exceeded") ||
+        error.message.toLowerCase().includes("too large"))
+    ) {
       return errorResponse("La imagen pesa demasiado. Probá con menos elementos.", 413);
     }
 

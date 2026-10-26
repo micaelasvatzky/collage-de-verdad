@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PALETTE_ITEMS } from "@/data/paletteElements";
 import { clampCenter } from "@/lib/collageGeometry";
@@ -7,7 +8,7 @@ import type { PaletteItem as PaletteItemModel, PlacedElement } from "@/types/col
 import CollageElement from "@/components/CollageElement/CollageElement";
 import ElementPalette from "@/components/ElementPalette/ElementPalette";
 import ElementVisual from "@/components/ElementVisual/ElementVisual";
-import ExportPanel from "@/components/ExportPanel/ExportPanel";
+import FinishDialog from "@/components/FinishDialog/FinishDialog";
 import PhotoBoard from "@/components/PhotoBoard/PhotoBoard";
 import styles from "./CollageWorkspace.module.css";
 
@@ -32,6 +33,7 @@ export default function CollageWorkspace() {
   const [placed, setPlaced] = useState<PlacedElement[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [spawn, setSpawn] = useState<SpawnPreview | null>(null);
+  const [finishOpen, setFinishOpen] = useState(false);
 
   const boardRef = useRef<HTMLDivElement>(null);
   const photoRef = useRef<HTMLDivElement>(null);
@@ -90,6 +92,9 @@ export default function CollageWorkspace() {
     setSelectedId((current) => (current === id ? null : current));
   }, []);
 
+  const handleDeselect = useCallback(() => setSelectedId(null), []);
+  const handleFinishClose = useCallback(() => setFinishOpen(false), []);
+
   /* Si cambia el tamaño de la ventana, reencuadramos las piezas al nuevo marco. */
   useEffect(() => {
     function handleResize() {
@@ -129,10 +134,28 @@ export default function CollageWorkspace() {
 
   return (
     <div className={styles.workspace} onPointerDown={() => setSelectedId(null)}>
-      <div className={styles.caption}>
-        <h1>Collage de Verdad</h1>
-        <p>Arrastrá los elementos de la mesa sobre la foto para crear tu propia realidad.</p>
-      </div>
+      <header className={styles.topBar}>
+        <div className={styles.brand}>
+          <span className={styles.brandTitle}>Collage de Verdad</span>
+          <span className={styles.brandHint}>
+            Arrastrá los elementos de la mesa sobre la foto.
+          </span>
+        </div>
+
+        <nav className={styles.actions} aria-label="Acciones">
+          <Link className={styles.ghost} href="/collages">
+            Galería
+          </Link>
+          <button
+            type="button"
+            className={styles.finish}
+            onClick={() => setFinishOpen(true)}
+            disabled={finishOpen}
+          >
+            Terminé
+          </button>
+        </nav>
+      </header>
 
       <div className={styles.stage}>
         <PhotoBoard ref={boardRef} contentRef={photoRef}>
@@ -162,7 +185,12 @@ export default function CollageWorkspace() {
         onSpawnCancel={handleSpawnCancel}
       />
 
-      <ExportPanel onDeselect={() => setSelectedId(null)} boardRef={boardRef} />
+      <FinishDialog
+        open={finishOpen}
+        onClose={handleFinishClose}
+        onDeselect={handleDeselect}
+        boardRef={boardRef}
+      />
 
       {spawn && spawnItem ? (
         <div className={styles.spawnPreview} style={{ left: spawn.clientX, top: spawn.clientY }}>

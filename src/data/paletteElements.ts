@@ -17,9 +17,20 @@ export const PALETTE_ITEMS: PaletteItem[] = [
     width: 96,
     height: 96,
     tableX: 9,
-    tableY: 11,
+    tableY: 21,
     restRotation: -18,
     src: "/elementos/button blue.png",
+  },
+  {
+    id: "download",
+    label: "Sticker",
+    kind: "sticker",
+    width: 66,
+    height: 104,
+    tableX: 3,
+    tableY: 19,
+    restRotation: -16,
+    src: "/elementos/download (4).png",
   },
   {
     id: "eyes",
@@ -63,7 +74,7 @@ export const PALETTE_ITEMS: PaletteItem[] = [
     width: 160,
     height: 97,
     tableX: 90,
-    tableY: 10,
+    tableY: 20,
     restRotation: 14,
     src: "/elementos/bow.png",
   },
@@ -147,7 +158,7 @@ export const PALETTE_ITEMS: PaletteItem[] = [
     src: "/elementos/smile.png",
   },
 
-  // ---- Dispersas por arriba ----
+  // ---- Dispersas por el hueco de arriba (entre la marca y los botones) ----
   {
     id: "coin",
     label: "Moneda",
@@ -191,16 +202,5 @@ export const PALETTE_ITEMS: PaletteItem[] = [
     tableY: 4,
     restRotation: 8,
     src: "/elementos/fire.png",
-  },
-  {
-    id: "download",
-    label: "Sticker",
-    kind: "sticker",
-    width: 66,
-    height: 104,
-    tableX: 3,
-    tableY: 4,
-    restRotation: -16,
-    src: "/elementos/download (4).png",
   },
 ];

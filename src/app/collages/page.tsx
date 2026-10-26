@@ -3,7 +3,7 @@ import { io } from "next/cache";
 import Link from "next/link";
 import { Suspense } from "react";
 import CollageGallery from "@/components/CollageGallery/CollageGallery";
-import { isBlobConfigured, listCollages } from "@/lib/collageStore";
+import { isStoreConfigured, listCollages } from "@/lib/collageStore";
 import styles from "./collages.module.css";
 
 export const metadata: Metadata = {
@@ -14,11 +14,11 @@ export const metadata: Metadata = {
 async function GalleryContent() {
   await io();
 
-  if (!isBlobConfigured()) {
+  if (!isStoreConfigured()) {
     return (
       <div className={styles.notice}>
         <h2>La galería todavía no está configurada</h2>
-        <p>Falta conectar el almacenamiento. Avisale a quien organiza la actividad.</p>
+        <p>Falta conectar la base de datos. Avisale a quien organiza la actividad.</p>
       </div>
     );
   }
@@ -61,9 +61,14 @@ export default function CollagesPage() {
             Buscá el tuyo, mirá los de los demás y descargá el que más te guste.
           </p>
         </div>
-        <Link className={styles.createLink} href="/">
-          Crear el mío
-        </Link>
+        <div className={styles.headerActions}>
+          <Link className={styles.finishLink} href="/">
+            Finalizar experiencia
+          </Link>
+          <a className={styles.createLink} href="/crear">
+            Crear el mío
+          </a>
+        </div>
       </header>
 
       <Suspense fallback={<GallerySkeleton />}>

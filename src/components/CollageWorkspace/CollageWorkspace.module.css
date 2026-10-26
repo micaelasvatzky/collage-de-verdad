@@ -11,27 +11,99 @@
     radial-gradient(150% 110% at 50% -10%, var(--table-light) 0%, var(--table-mid) 45%, var(--table-dark) 100%);
 }
 
-.caption {
+/* Barra de arriba: marca a la izquierda, acciones a la derecha.
+   La capa no captura el puntero, así las piezas de la mesa se siguen
+   arrastrando aunque estén debajo. */
+.topBar {
   position: absolute;
-  top: 20px;
-  left: 24px;
-  z-index: 10;
-  max-width: 320px;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px clamp(14px, 3vw, 30px);
+  background: linear-gradient(180deg, rgba(16, 9, 3, 0.78) 0%, rgba(16, 9, 3, 0) 100%);
   pointer-events: none;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
-.caption h1 {
-  margin: 0 0 4px;
-  font-size: 22px;
-  letter-spacing: 0.4px;
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  pointer-events: none;
 }
 
-.caption p {
-  margin: 0;
+.brandTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(19px, 2.2vw, 25px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.brandHint {
+  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.ghost,
+.finish {
+  padding: 11px 20px;
+  border-radius: 999px;
+  font-family: inherit;
   font-size: 13px;
-  line-height: 1.4;
-  opacity: 0.88;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 140ms ease,
+    background 140ms ease,
+    filter 140ms ease;
+}
+
+.ghost {
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(20, 12, 6, 0.28);
+  color: #fff;
+}
+
+.ghost:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.finish {
+  border: none;
+  background: linear-gradient(140deg, #f0cf8a, #d9a95b 55%, #b98a3c);
+  color: #241306;
+  cursor: pointer;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+.finish:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.finish:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .stage {
@@ -54,4 +126,24 @@
   transform: translate(-50%, -50%) scale(1.08);
   opacity: 0.92;
   pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .topBar {
+    padding: 12px 14px;
+  }
+
+  .brandHint {
+    display: none;
+  }
+
+  .ghost,
+  .finish {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+
+  .actions {
+    gap: 8px;
+  }
 }

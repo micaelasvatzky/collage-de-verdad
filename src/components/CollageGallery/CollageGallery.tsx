@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { CollageRecord } from "@/types/gallery";
@@ -148,9 +147,9 @@ export default function CollageGallery({ collages }: Props) {
         <div className={styles.empty}>
           <h2>Todavía no hay collages</h2>
           <p>¡Creá el primero y quedate con el mejor lugar de la galería!</p>
-          <Link className={styles.emptyLink} href="/">
+          <a className={styles.emptyLink} href="/crear">
             Crear mi collage
-          </Link>
+          </a>
         </div>
       ) : filtered.length === 0 ? (
         <div className={styles.empty}>
