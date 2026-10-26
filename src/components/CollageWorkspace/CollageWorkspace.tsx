@@ -1,16 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { PALETTE_ITEMS } from "@/data/paletteElements";
 import { clampCenter } from "@/lib/collageGeometry";
+import {
+  addSessionCollageId,
+  getSessionGalleryServerSnapshot,
+  getSessionGallerySnapshot,
+  subscribeSessionGallery,
+} from "@/lib/sessionGallery";
 import type { PaletteItem as PaletteItemModel, PlacedElement } from "@/types/collage";
 import CollageElement from "@/components/CollageElement/CollageElement";
 import ElementPalette from "@/components/ElementPalette/ElementPalette";
 import ElementVisual from "@/components/ElementVisual/ElementVisual";
 import FinishDialog from "@/components/FinishDialog/FinishDialog";
 import PhotoBoard from "@/components/PhotoBoard/PhotoBoard";
+import SessionBackdrop from "@/components/SessionBackdrop/SessionBackdrop";
 import styles from "./CollageWorkspace.module.css";
+
+/**
+ * Si alguien cierra el modal de cierre sin mandar la obra a la galería, le
+ * damos unos segundos y devolvemos la mesa a la bienvenida. Es una muestra:
+ * la próxima persona tiene que encontrar la estación limpia.
+ */
+const AUTO_RESET_MS = 15000;
 
 interface SpawnPreview {
   paletteId: string;
@@ -35,9 +49,18 @@ export default function CollageWorkspace() {
   const [spawn, setSpawn] = useState<SpawnPreview | null>(null);
   const [finishOpen, setFinishOpen] = useState(false);
 
+  /* Fondo de la mesa: los publicados en esta pestaña (no en la galería). */
+  const sessionIds = useSyncExternalStore(
+    subscribeSessionGallery,
+    getSessionGallerySnapshot,
+    getSessionGalleryServerSnapshot,
+  );
+
   const boardRef = useRef<HTMLDivElement>(null);
   const photoRef = useRef<HTMLDivElement>(null);
   const seqRef = useRef(0);
+  const resetTimerRef = useRef<number | null>(null);
+  const publishedRef = useRef(false);
 
   function handleSpawnMove(item: PaletteItemModel, clientX: number, clientY: number) {
     setSpawn({ paletteId: item.id, clientX, clientY });
@@ -93,7 +116,47 @@ export default function CollageWorkspace() {
   }, []);
 
   const handleDeselect = useCallback(() => setSelectedId(null), []);
-  const handleFinishClose = useCallback(() => setFinishOpen(false), []);
+
+  const cancelAutoReset = useCallback(() => {
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    }
+  }, []);
+
+  /** El modal se cerró: si no se publicó, la mesa se rinde sola. */
+  const handleFinishClose = useCallback(() => {
+    setFinishOpen(false);
+    cancelAutoReset();
+
+    if (publishedRef.current) {
+      publishedRef.current = false;
+      return;
+    }
+
+    resetTimerRef.current = window.setTimeout(() => {
+      window.location.replace("/");
+    }, AUTO_RESET_MS);
+  }, [cancelAutoReset]);
+
+  const handleFinishOpen = useCallback(() => {
+    publishedRef.current = false;
+    cancelAutoReset();
+    setFinishOpen(true);
+  }, [cancelAutoReset]);
+
+  /** Al publicar se suma al fondo de la mesa de esta sesión. */
+  const handlePublished = useCallback(
+    (id: string) => {
+      publishedRef.current = true;
+      cancelAutoReset();
+      addSessionCollageId(id);
+    },
+    [cancelAutoReset],
+  );
+
+  /* Si la mesa se desmonta, no dejamos un reinicio colgado. */
+  useEffect(() => cancelAutoReset, [cancelAutoReset]);
 
   /* Si cambia el tamaño de la ventana, reencuadramos las piezas al nuevo marco. */
   useEffect(() => {
@@ -115,6 +178,9 @@ export default function CollageWorkspace() {
   /* Atajos: Escape deselecciona, Delete/Backspace quita la pieza elegida. */
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
+      // Si hay un reinicio pendiente y la persona sigue acá, no la echamos.
+      cancelAutoReset();
+
       if (e.key === "Escape") {
         setSelectedId(null);
         return;
@@ -128,12 +194,20 @@ export default function CollageWorkspace() {
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedId]);
+  }, [cancelAutoReset, selectedId]);
 
   const spawnItem = spawn ? findPaletteItem(spawn.paletteId) : undefined;
 
   return (
-    <div className={styles.workspace} onPointerDown={() => setSelectedId(null)}>
+    <div
+      className={styles.workspace}
+      onPointerDown={() => {
+        setSelectedId(null);
+        cancelAutoReset();
+      }}
+    >
+      <SessionBackdrop ids={sessionIds} />
+
       <header className={styles.topBar}>
         <div className={styles.brand}>
           <span className={styles.brandTitle}>Collage de Verdad</span>
@@ -149,7 +223,7 @@ export default function CollageWorkspace() {
           <button
             type="button"
             className={styles.finish}
-            onClick={() => setFinishOpen(true)}
+            onClick={handleFinishOpen}
             disabled={finishOpen}
           >
             Terminé
@@ -189,6 +263,7 @@ export default function CollageWorkspace() {
         open={finishOpen}
         onClose={handleFinishClose}
         onDeselect={handleDeselect}
+        onPublished={handlePublished}
         boardRef={boardRef}
       />
 

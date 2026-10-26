@@ -1,0 +1,32 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /*
+   * MUY tenue: la idea es adivinarlas, no leerlas. Si alguna vez queda
+   * demasiado invisible (o demasiado presente), este es el único número
+   * que hay que tocar.
+   */
+  opacity: 0.075;
+  filter: saturate(0.8);
+}
+
+.print {
+  position: absolute;
+  width: min(19vw, 300px);
+  /*
+   * La copia es el PNG tal cual se publicó (1120x758): la foto con su marco
+   * blanco de 10px. Si la caja no respeta esa proporción, `cover` recorta los
+   * costados y el borde blanco aparece solo arriba y abajo. Con la proporción
+   * real del marco se ven los cuatro lados parejos.
+   */
+  aspect-ratio: 560 / 379;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.ghost {
+  object-fit: cover;
+}

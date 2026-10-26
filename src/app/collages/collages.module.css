@@ -3,7 +3,8 @@
   min-height: 100dvh;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 32px 20px 64px;
+  /* Aire abajo para que la tarjeta fija del QR no tape la última fila. */
+  padding: 32px 20px 200px;
   background:
     radial-gradient(circle at 12% 0%, rgba(217, 169, 91, 0.24), transparent 38%),
     radial-gradient(circle at 88% 18%, rgba(124, 80, 41, 0.4), transparent 42%),
@@ -13,6 +14,7 @@
 
 .header {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
   gap: 20px;
@@ -20,6 +22,10 @@
   margin: 0 auto 28px;
   padding-bottom: 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.headerText {
+  min-width: 0;
 }
 
 .kicker {
@@ -144,7 +150,7 @@
 
 @media (max-width: 640px) {
   .page {
-    padding: 24px 14px 48px;
+    padding: 24px 14px 180px;
   }
 
   .header {

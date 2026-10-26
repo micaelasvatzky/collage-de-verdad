@@ -8,6 +8,8 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onDeselect: () => void;
+  /** Se llama cuando la obra quedó publicada: alimenta el fondo de la mesa. */
+  onPublished?: (id: string) => void;
   boardRef: RefObject<HTMLDivElement | null>;
 }
 
@@ -58,7 +60,13 @@ async function captureForUpload(board: HTMLElement) {
  * que ya apunta a una descarga real. El formulario solo le pone nombre y título
  * y la publica en la galería.
  */
-export default function FinishDialog({ open, onClose, onDeselect, boardRef }: Props) {
+export default function FinishDialog({
+  open,
+  onClose,
+  onDeselect,
+  onPublished,
+  boardRef,
+}: Props) {
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -237,6 +245,7 @@ export default function FinishDialog({ open, onClose, onDeselect, boardRef }: Pr
 
       // Cerramos antes de navegar: si alguien vuelve atrás, no reaparece
       // el modal con un borrador ya publicado.
+      onPublished?.(draftId);
       resetDraftState();
       onClose();
       router.push(`/collages?destacado=${draftId}`);

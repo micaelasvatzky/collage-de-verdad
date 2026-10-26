@@ -3,6 +3,7 @@ import { io } from "next/cache";
 import Link from "next/link";
 import { Suspense } from "react";
 import CollageGallery from "@/components/CollageGallery/CollageGallery";
+import GalleryQr from "@/components/GalleryQr/GalleryQr";
 import { isStoreConfigured, listCollages } from "@/lib/collageStore";
 import styles from "./collages.module.css";
 
@@ -54,7 +55,7 @@ export default function CollagesPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <div>
+        <div className={styles.headerText}>
           <p className={styles.kicker}>Collage de Verdad</p>
           <h1 className={styles.heading}>Galería de collages</h1>
           <p className={styles.subtitle}>
@@ -70,6 +71,8 @@ export default function CollagesPage() {
           </a>
         </div>
       </header>
+
+      <GalleryQr />
 
       <Suspense fallback={<GallerySkeleton />}>
         <GalleryContent />

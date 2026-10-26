@@ -20,18 +20,6 @@ export default function CollageGallery({ collages }: Props) {
   const searchParams = useSearchParams();
   const highlightId = searchParams?.get("destacado") ?? null;
   const [query, setQuery] = useState("");
-  const [qr, setQr] = useState<{ id: string; url: string; dataUrl: string } | null>(null);
-  const [copied, setCopied] = useState(false);
-
-  const highlighted = useMemo(
-    () => (highlightId ? collages.find((collage) => collage.id === highlightId) ?? null : null),
-    [collages, highlightId],
-  );
-
-  const activeQr = highlighted && qr?.id === highlighted.id ? qr : null;
-  const isLocal = Boolean(
-    activeQr && (activeQr.url.includes("//localhost") || activeQr.url.includes("//127.0.0.1")),
-  );
 
   const filtered = useMemo(() => {
     const normalizedQuery = normalize(query.trim());
@@ -55,76 +43,8 @@ export default function CollageGallery({ collages }: Props) {
     return () => window.clearTimeout(timer);
   }, [highlightId, filtered.length]);
 
-  useEffect(() => {
-    if (!highlighted) return;
-
-    const id = highlighted.id;
-    const url = `${window.location.origin}/collages?destacado=${id}`;
-    let cancelled = false;
-
-    import("qrcode")
-      .then(({ toDataURL }) =>
-        toDataURL(url, {
-          width: 220,
-          margin: 1,
-          color: { dark: "#1a1206", light: "#ffffff" },
-        }),
-      )
-      .then((dataUrl) => {
-        if (!cancelled) setQr({ id, url, dataUrl });
-      })
-      .catch(() => {
-        if (!cancelled) setQr(null);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [highlighted]);
-
-  async function copyShareUrl() {
-    if (!activeQr) return;
-
-    try {
-      await navigator.clipboard.writeText(activeQr.url);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  }
-
   return (
     <div className={styles.wrapper}>
-      {activeQr && highlighted && (
-        <section className={styles.qrCard}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={activeQr.dataUrl}
-            alt={`QR para abrir el collage ${highlighted.title}`}
-            className={styles.qrImage}
-            width={200}
-            height={200}
-          />
-          <div className={styles.qrInfo}>
-            <p className={styles.qrKicker}>Tu collage está en la galería</p>
-            <h2 className={styles.qrTitle}>{highlighted.title}</h2>
-            <p className={styles.qrText}>
-              Escaneá el QR o compartí el link para que otra persona lo vea y lo descargue.
-            </p>
-            {isLocal && (
-              <p className={styles.qrHint}>
-                El QR va a funcionar cuando la app esté publicada en Vercel.
-              </p>
-            )}
-            <code className={styles.shareUrl}>{activeQr.url}</code>
-            <button type="button" className={styles.copyButton} onClick={copyShareUrl}>
-              {copied ? "Link copiado" : "Copiar link"}
-            </button>
-          </div>
-        </section>
-      )}
-
       <div className={styles.toolbar}>
         <label className={styles.searchLabel} htmlFor="collage-search">
           Buscar
