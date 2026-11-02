@@ -3,7 +3,7 @@
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32));
+  filter: drop-shadow(0 2px 2px rgba(31, 18, 6, 0.65)) drop-shadow(0 7px 9px rgba(31, 18, 6, 0.45));
   /* La interacción la maneja siempre el elemento padre. */
   pointer-events: none;
 }

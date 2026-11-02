@@ -8,5 +8,7 @@
 }
 
 .palette > * {
+  /* Se muestran cuando ya tienen un lugar libre asignado. */
+  visibility: hidden;
   pointer-events: auto;
 }

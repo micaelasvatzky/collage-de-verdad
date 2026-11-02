@@ -2,10 +2,19 @@
   --table-dark: #553418;
   --table-mid: #7c5029;
   --table-light: #a5753f;
+  --rotate-handle: #246cc4;
+  --scale-handle: #cf3434;
 }
 
 * {
   box-sizing: border-box;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #e8c07a;
+  outline-offset: 4px;
 }
 
 html,

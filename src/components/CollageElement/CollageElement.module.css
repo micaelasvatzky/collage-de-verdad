@@ -23,7 +23,7 @@
   position: absolute;
   inset: -6px;
   border: 1.5px dashed rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
+  border-radius: 0;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
   pointer-events: none;
 }
@@ -34,9 +34,9 @@
   bottom: -8px;
   width: 16px;
   height: 16px;
-  border: 2px solid #2f86d6;
+  border: 2px solid #fff;
   border-radius: 50%;
-  background: #fff;
+  background: var(--scale-handle);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   cursor: nwse-resize;
   touch-action: none;
@@ -50,9 +50,9 @@
   top: -36px;
   width: 16px;
   height: 16px;
-  border: 2px solid #d94f8a;
+  border: 2px solid #fff;
   border-radius: 50%;
-  background: #fff;
+  background: var(--rotate-handle);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   cursor: grab;
   touch-action: none;
@@ -83,7 +83,7 @@
   padding: 0;
   border: 2px solid #fff;
   border-radius: 50%;
-  background: #d94f4f;
+  background: #553418;
   color: #fff;
   font-size: 12px;
   line-height: 1;

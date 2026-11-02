@@ -13,9 +13,8 @@
   margin-bottom: 20px;
   padding: 10px 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  background: rgba(30, 17, 8, 0.82);
-  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  background: #2b180a;
 }
 
 .searchLabel {
@@ -65,26 +64,23 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  background: rgba(52, 31, 14, 0.72);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+  border: 1px solid #eedcbc;
+  border-radius: 8px;
+  background: #f8ecd6;
+  color: #2a1a0b;
+  box-shadow: 0 4px 12px #1f120680;
   scroll-margin-top: 92px;
-  transition:
-    border-color 160ms ease,
-    transform 160ms ease;
+  transition: border-color 160ms ease;
 }
 
 .card:hover {
-  border-color: rgba(224, 184, 110, 0.42);
-  transform: translateY(-2px);
+  border-color: #d9a95b;
 }
 
 .highlighted {
   border-color: #e0b86e;
-  box-shadow:
-    0 0 0 3px rgba(224, 184, 110, 0.26),
-    0 18px 42px rgba(0, 0, 0, 0.26);
+  outline: 2px solid #e0b86e;
+  outline-offset: 4px;
 }
 
 .image {
@@ -106,13 +102,15 @@
 
 .cardTitle {
   margin: 0;
-  font-size: 18px;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
   line-height: 1.2;
 }
 
 .cardAuthor {
   margin: 0 0 10px;
-  color: rgba(255, 255, 255, 0.64);
+  color: #7c5029;
   font-size: 12px;
 }
 
@@ -121,7 +119,7 @@
   margin-top: auto;
   padding: 8px 12px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #d9a95b, #b98a3c);
+  background: #d9a95b;
   color: #1a1206;
   font-size: 12px;
   font-weight: 800;
@@ -135,7 +133,7 @@
 .empty {
   padding: 34px 24px;
   border: 1px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  border-radius: 8px;
   text-align: center;
 }
 
@@ -153,7 +151,7 @@
 .emptyLink {
   display: inline-block;
   padding: 9px 14px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: #e0b86e;
   color: #241306;
   font-size: 13px;

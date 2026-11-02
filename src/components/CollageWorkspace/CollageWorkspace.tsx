@@ -58,6 +58,8 @@ export default function CollageWorkspace() {
 
   const boardRef = useRef<HTMLDivElement>(null);
   const photoRef = useRef<HTMLDivElement>(null);
+  const brandRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLElement>(null);
   const seqRef = useRef(0);
   const resetTimerRef = useRef<number | null>(null);
   const publishedRef = useRef(false);
@@ -209,14 +211,27 @@ export default function CollageWorkspace() {
       <SessionBackdrop ids={sessionIds} />
 
       <header className={styles.topBar}>
-        <div className={styles.brand}>
-          <span className={styles.brandTitle}>Collage de Verdad</span>
-          <span className={styles.brandHint}>
-            Arrastrá los elementos de la mesa sobre la foto.
-          </span>
+        <div ref={brandRef} className={styles.brand}>
+          <Link className={styles.brandTitle} href="/" aria-label="Collage de Verdad: volver a la bienvenida">
+            Collage de Verdad
+          </Link>
+          <aside className={styles.instructions} aria-label="Cómo crear tu collage">
+            <ol>
+              <li>Arrastrá los elementos de la mesa sobre la foto.</li>
+              <li>
+                Tocá un elemento y arrastrá el <span className={styles.rotateCue}>círculo azul de arriba</span> para rotarlo.
+              </li>
+              <li>
+                Arrastrá el <span className={styles.scaleCue}>círculo rojo de la esquina</span> hacia afuera para agrandarlo o hacia adentro para achicarlo.
+              </li>
+              <li>
+                Cuando termines, tocá <strong>Terminé</strong>: podés escanear el QR para descargar tu collage y completar el formulario para publicarlo en la galería.
+              </li>
+            </ol>
+          </aside>
         </div>
 
-        <nav className={styles.actions} aria-label="Acciones">
+        <nav ref={actionsRef} className={styles.actions} aria-label="Acciones">
           <Link className={styles.ghost} href="/collages">
             Galería
           </Link>
@@ -253,6 +268,9 @@ export default function CollageWorkspace() {
 
       <ElementPalette
         items={PALETTE_ITEMS}
+        boardRef={boardRef}
+        brandRef={brandRef}
+        actionsRef={actionsRef}
         draggingId={spawn?.paletteId ?? null}
         onSpawnMove={handleSpawnMove}
         onSpawnDrop={handleSpawnDrop}

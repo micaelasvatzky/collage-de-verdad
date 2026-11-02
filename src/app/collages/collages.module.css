@@ -5,10 +5,7 @@
   overscroll-behavior: contain;
   /* Aire abajo para que la tarjeta fija del QR no tape la última fila. */
   padding: 32px 20px 200px;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(217, 169, 91, 0.24), transparent 38%),
-    radial-gradient(circle at 88% 18%, rgba(124, 80, 41, 0.4), transparent 42%),
-    linear-gradient(180deg, #2b180a 0%, #1b0f06 100%);
+  background: #2b180a;
   user-select: text;
 }
 
@@ -58,7 +55,7 @@
   flex: 0 0 auto;
   padding: 10px 16px;
   border: 1px solid rgba(224, 184, 110, 0.65);
-  border-radius: 999px;
+  border-radius: 8px;
   color: #f1d6a5;
   font-size: 13px;
   font-weight: 700;
@@ -84,7 +81,7 @@
 .finishLink {
   padding: 10px 16px;
   border: 1px solid rgba(255, 255, 255, 0.26);
-  border-radius: 999px;
+  border-radius: 8px;
   background: rgba(20, 12, 6, 0.32);
   color: rgba(255, 255, 255, 0.9);
   font-size: 13px;
@@ -105,7 +102,7 @@
   margin: 0 auto;
   padding: 26px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 16px;
+  border-radius: 8px;
   background: rgba(0, 0, 0, 0.22);
 }
 
@@ -132,20 +129,8 @@
 .skeletonCard {
   aspect-ratio: 548 / 364;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  background: linear-gradient(100deg, rgba(255, 255, 255, 0.04) 20%, rgba(255, 255, 255, 0.12) 40%, rgba(255, 255, 255, 0.04) 60%);
-  background-size: 220% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  from {
-    background-position: 120% 0;
-  }
-
-  to {
-    background-position: -120% 0;
-  }
+  border-radius: 8px;
+  background: #553418;
 }
 
 @media (max-width: 640px) {
@@ -161,11 +146,5 @@
 
   .headerActions {
     width: 100%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeletonCard {
-    animation: none;
   }
 }

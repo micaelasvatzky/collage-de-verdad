@@ -10,34 +10,35 @@ export const metadata: Metadata = {
 export default function WelcomePage() {
   return (
     <main className={styles.page}>
-      <div className={styles.shade} aria-hidden="true" />
-
       <div className={styles.content}>
-        <p className={styles.kicker}>Una experiencia de arte</p>
-
         <h1 className={styles.title}>
           Collage
-          <em className={styles.titleAccent}>de verdad</em>
+          <span className={styles.titleAccent}>de verdad</span>
         </h1>
 
-        <p className={styles.subtitle}>
-          Una foto, una mesa llena de objetos y una sola regla:
-          <br />
-          armá tu propia verdad.
-        </p>
+        <div className={styles.invitation}>
+          <p className={styles.kicker}>La mesa está lista.</p>
+          <p className={styles.subtitle}>
+            <span>Una foto y una mesa llena de objetos.</span>
+            <span>Arrastrá, mezclá, probá.</span>
+            <span>Armá tu propia verdad.</span>
+          </p>
 
-        <div className={styles.actions}>
-          {/* Ancla real (no <Link>): así el taller arranca siempre limpio. */}
-          <a className={styles.start} href="/crear">
-            Comenzar
-          </a>
-          <a className={styles.gallery} href="/collages">
-            Ver la galería
-          </a>
+          <div className={styles.actions}>
+            {/* Ancla real (no <Link>): así el taller arranca siempre limpio. */}
+            <a className={styles.start} href="/crear">
+              Comenzar
+            </a>
+            <a className={styles.gallery} href="/collages">
+              Ver la galería
+            </a>
+          </div>
         </div>
       </div>
 
-      <p className={styles.footer}>Creá tu collage. Llevátelo. Dejalo en la galería.</p>
+      <footer className={styles.footer}>
+        Micaela Svatzky - 2026
+      </footer>
     </main>
   );
 }

@@ -9,19 +9,16 @@
   gap: 8px;
   padding: 10px 10px 9px;
   border: 1px solid rgba(224, 184, 110, 0.34);
-  border-radius: 16px;
-  background: rgba(24, 13, 6, 0.88);
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  background: #f8ecd6;
+  box-shadow: 0 5px 14px #24130680;
 }
 
 .frame {
   width: 96px;
   height: 96px;
   padding: 7px;
-  border-radius: 10px;
+  border-radius: 0;
   background: #ffffff;
 }
 
@@ -34,7 +31,7 @@
 .caption {
   max-width: 13ch;
   margin: 0;
-  color: rgba(241, 214, 165, 0.96);
+  color: #553418;
   font-size: 11px;
   font-weight: 700;
   line-height: 1.25;
@@ -48,7 +45,7 @@
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     gap: 6px;
     padding: 8px 8px 7px;
-    border-radius: 14px;
+    border-radius: 8px;
   }
 
   .frame {
